@@ -25,10 +25,6 @@ rufio.ProjectileWeapon = function(){
 rufio.ProjectileWeapon.prototype = Object.create(rufio.MyUserData.prototype);
 rufio.ProjectileWeapon.prototype.constructor = rufio.ProjectileWeapon;
 
-
-
-
-
 rufio.MeleeWeapon = function(){
 	this.name = "Unnamed Melee Weapon";
 };
@@ -65,6 +61,7 @@ rufio.Bullet = function(obj3D, spawnPosition, radius) {
     this.damage = 1;
     this.hitObj3D = null;
     this.localHitPosition = new THREE.Vector3(0,0,0);
+    this.localHitOrientation = null;
     this.airTime = 1000;
     this.blowBack = 0.2;
     this.zIndex = 1.5;
@@ -101,14 +98,19 @@ rufio.Bullet = function(obj3D, spawnPosition, radius) {
         this.bodyType = rufio.BodyType.ORNAMENTAL;
         this.hitObj3D = obj3D;
     	this.localHitPosition.copy(this.hitObj3D.position).sub(this.position).negate();
-        
+        this.localHitOrientation = this.hitObj3D.orientation;
 
     	//this.position.setZ(1);
     	this.airTime = 1000000; //Land forever
     };
 
     this.customModifiers = function() {
-        if(this.hitObj3D) this.position.copy(this.hitObj3D.position).add(this.localHitPosition);
+        if(this.hitObj3D){
+            var tmpLocalPos = new THREE.Vector3(this.localHitPosition);
+            var zAxis = new THREE.Vector3(0,0,1); // UP
+            tmpLocalPos.applyAxisAngle(zAxis, this.hitObj3D.orientaion - this.localHitOrientation);
+            this.position.copy(this.hitObj3D.position).add(tmpLocalPos);
+        }
     };
 };
 rufio.Bullet.prototype = Object.create(rufio.UserCircle.prototype);

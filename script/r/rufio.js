@@ -5,6 +5,7 @@
  */
 var date = new Date();
 var rufio = rufio || {};
+rufio.DEBUG = true;
 rufio.collision = {};
 rufio.BodyType = {
     STATIC: "static",
@@ -18,6 +19,7 @@ rufio.MyUserData = function(obj3D, bodyType) {
     this.frames = 0;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.position = new THREE.Vector3(0, 0, 0);
+    this.orientation = 0; //directly left
 
     //time for reference
     this.spawnTime = (new Date()).getTime();
@@ -50,6 +52,8 @@ rufio.MyUserData = function(obj3D, bodyType) {
         //clear mods
         this.velocityModifier.set(0, 0, 0);
         this.positionModifier.set(0, 0, 0);
+        //TODO: This should happen last in the render loop
+        if(rufio.DEBUG) this.updateDebug();
     };
 
     // To be set by child classes:
@@ -61,6 +65,20 @@ rufio.MyUserData = function(obj3D, bodyType) {
     this.mouseOver = function() {};
 
     this.handleCollision = function(collidingObject) {};
+
+    this.constructDebugText = function(){
+        return "Oh hey";
+    }
+
+    this.updateDebug = function(){
+        this.debugDiv.innerHTML = this.constructDebugText();
+        this.debugDiv.style.top = (200 +this.position.x)*pixelsToUnits  + 'px';
+        this.debugDiv.style.left = (200 +this.position.y)*pixelsToUnits + 'px';
+    }
+
+    if(rufio.DEBUG){
+        this.debugDiv = rufio.createDebugText(this.obj3D.id);
+    }
 };
 
 rufio.UserCircle = function(obj3D, bodyType, radius) {
@@ -114,6 +132,7 @@ rufio.createCircle = function(radius, segments, material) {
 
 rufio.controlObject3D = function(obj3D, direction) {
     direction.normalize().multiplyScalar(obj3D.userData.moveSpeed);
+    obj3D.userData.orientation = direction.angleTo(new THREE.Vector3(1,0,0));
     obj3D.userData.velocity.copy(direction);
 };
 
@@ -265,5 +284,19 @@ rufio.collision.circleLine = function(circUD, line){
     return false;
 };
 
+rufio.createDebugText = function(id) {
+    //this is just to experiement
+    var text2 = document.createElement('div');
+    text2.style.position = 'absolute';
+    //text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
+    text2.style.width = 100;
+    text2.style.height = 100;
+    text2.style.backgroundColor = "blue";
+    text2.innerHTML = "hi there!";
+    text2.style.top = 200 + 'px';
+    text2.style.left = 200 + 'px';
+    text2.id = id;
 
-//this is just to experiement
+    document.body.appendChild(text2);
+    return text2;
+}
