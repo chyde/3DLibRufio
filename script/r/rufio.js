@@ -5,13 +5,21 @@
  */
 var date = new Date();
 var rufio = rufio || {};
-rufio.DEBUG = true;
 rufio.collision = {};
 rufio.BodyType = {
     STATIC: "static",
     INTERACTIVE: "interactive",
     ORNAMENTAL: "ornamental"
 };
+rufio.Debug_Display_Mode = {
+    NONE: "none",
+    NO_PROJECTILES: "no projectiles",
+    CREATURES: "creatures",
+    ALL: "all"
+};
+
+rufio.DEBUG = true;
+rufio.dbDisplay = rufio.Debug_Display_Mode.ALL;
 
 rufio.MyUserData = function(obj3D, bodyType) {
     // These represent real values, and the object3D shall 
@@ -53,7 +61,7 @@ rufio.MyUserData = function(obj3D, bodyType) {
         this.velocityModifier.set(0, 0, 0);
         this.positionModifier.set(0, 0, 0);
         //TODO: This should happen last in the render loop
-        if(rufio.DEBUG) this.updateDebug();
+        if(rufio.DEBUG ) this.updateDebug();  //&& rufio.dbDisplay != rufio.Debug_Display_Mode.NONE
     };
 
     // To be set by child classes:
@@ -67,17 +75,34 @@ rufio.MyUserData = function(obj3D, bodyType) {
     this.handleCollision = function(collidingObject) {};
 
     this.constructDebugText = function(){
-        return "Oh hey";
+        return "" + this.position.x.toFixed(2) +", " + this.position.y.toFixed(2) + "<br>" + this.orientation.toFixed(2);
     }
 
     this.updateDebug = function(){
-        this.debugDiv.innerHTML = this.constructDebugText();
-        this.debugDiv.style.top = (200 +this.position.x)*pixelsToUnits  + 'px';
-        this.debugDiv.style.left = (200 +this.position.y)*pixelsToUnits + 'px';
+        //determine position
+        var y = -(this.position.y)/pixelsToUnits+(window.innerHeight/2);
+        var x = (this.position.x)/pixelsToUnits+(window.innerWidth/2)+15;
+
+
+        if(rufio.dbDisplay == rufio.Debug_Display_Mode.NONE){
+            this.debugDiv.style.display = "none";
+        }
+        else{
+            this.debugDiv.style.display = "inline";
+            this.debugDiv.innerHTML = this.constructDebugText();
+            this.debugDiv.style.top = y + 'px';
+            this.debugDiv.style.left = x + 'px';
+        }
+        //only display debug info *inside* the browser window.  (this will avoid scroll bars)
+        if(y < window.innerHeight*.2  || y > window.innerHeight*.8
+            || x < window.innerWidth*.2  || x > window.innerWidth*.8){
+            this.debugDiv.style.display = "none";
+        }
     }
 
+    //On create. 
     if(rufio.DEBUG){
-        this.debugDiv = rufio.createDebugText(this.obj3D.id);
+        this.debugDiv = rufio.createDebugText(this.obj3D.id);// Release version will never reach this
     }
 };
 
@@ -132,8 +157,11 @@ rufio.createCircle = function(radius, segments, material) {
 
 rufio.controlObject3D = function(obj3D, direction) {
     direction.normalize().multiplyScalar(obj3D.userData.moveSpeed);
-    obj3D.userData.orientation = direction.angleTo(new THREE.Vector3(1,0,0));
     obj3D.userData.velocity.copy(direction);
+    if( direction.lengthSq()){
+        obj3D.userData.orientation = Math.acos( direction.x / Math.sqrt(direction.x*direction.x + direction.y*direction.y) );
+        obj3D.userData.orientation *= direction.y?direction.y<0?-1:1:0; // get the sign
+    }
 };
 
 rufio.getDirectionalInput = function() {
@@ -291,12 +319,23 @@ rufio.createDebugText = function(id) {
     //text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
     text2.style.width = 100;
     text2.style.height = 100;
-    text2.style.backgroundColor = "blue";
     text2.innerHTML = "hi there!";
     text2.style.top = 200 + 'px';
     text2.style.left = 200 + 'px';
     text2.id = id;
+    text2.setAttribute("class", "unselectable");
+    text2.className = "unselectable";
+    text2.style.fontSize = "12px";
 
     document.body.appendChild(text2);
     return text2;
-}
+};
+
+rufio.rotate = function(center, v, angle) {
+    var cx = center.x, cy = center.y, x = v.x, y = v.y,
+        cos = Math.cos(angle),
+        sin = Math.sin(angle),
+        nx = (cos * (x - cx)) - (sin * (y - cy)) + cx,
+        ny = (sin * (x - cx)) + (cos * (y - cy)) + cy;
+    return v.set(nx, ny, v.z);
+};

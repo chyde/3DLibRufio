@@ -98,17 +98,18 @@ rufio.Bullet = function(obj3D, spawnPosition, radius) {
         this.bodyType = rufio.BodyType.ORNAMENTAL;
         this.hitObj3D = obj3D;
     	this.localHitPosition.copy(this.hitObj3D.position).sub(this.position).negate();
-        this.localHitOrientation = this.hitObj3D.orientation;
+        this.localHitOrientation = this.hitObj3D.userData.orientation;
 
     	//this.position.setZ(1);
     	this.airTime = 1000000; //Land forever
+        console.log("Bullet landed");
     };
 
     this.customModifiers = function() {
         if(this.hitObj3D){
-            var tmpLocalPos = new THREE.Vector3(this.localHitPosition);
-            var zAxis = new THREE.Vector3(0,0,1); // UP
-            tmpLocalPos.applyAxisAngle(zAxis, this.hitObj3D.orientaion - this.localHitOrientation);
+            //rest on the zombie
+            var tmpLocalPos = (new THREE.Vector3()).copy(this.localHitPosition);
+            rufio.rotate(new THREE.Vector3(), tmpLocalPos, this.hitObj3D.userData.orientation - this.localHitOrientation);
             this.position.copy(this.hitObj3D.position).add(tmpLocalPos);
         }
     };
