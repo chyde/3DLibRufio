@@ -102,7 +102,6 @@ rufio.Bullet = function(obj3D, spawnPosition, radius) {
 
     	//this.position.setZ(1);
     	this.airTime = 1000000; //Land forever
-        console.log("Bullet landed");
     };
 
     this.customModifiers = function() {

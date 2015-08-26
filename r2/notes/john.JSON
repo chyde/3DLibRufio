@@ -1,0 +1,8 @@
+{
+	"name": "John",
+	"description":  "Some mormon",
+	"state responses": {
+		"Default": "Do you Know where I can get a bike?",
+		"New Bike": "I am so Blessed to have a bike like this!"
+	}
+}

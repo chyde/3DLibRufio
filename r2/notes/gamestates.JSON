@@ -1,0 +1,16 @@
+{
+	"game states": [
+		"No Bike",
+		"Rusty Bike",
+		"Scooter",
+		"Trike",
+		"New Bike"
+	],
+
+	"concumstances": [
+		"Silly Mask",
+		"Just Crashed",
+		"Walked Away"
+	]
+
+}
