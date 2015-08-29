@@ -20,4 +20,19 @@ These interations are triggered when a certain condition is met (like the player
 This is when the normal bounds of interations need to be changed.  This is for "cut scenes" and set pieces in general.
 
 ##How does an interaction work?
+Well, conversations are an exchange, so we can break this down to a list of strings.  
+
+    [  "Once upon a time",
+       "Long ago in a distant land",
+       "Someone once lived."
+    ]
+
+This should be how a single monologue should be implemented.  Conversations are a bit more complicated.  See how Adam talks to Eve:
+
+    [  ["Once upon a time",
+           "Long ago in a distant land",
+           "Someone once lived."],
+           
+    ]
+  
 
