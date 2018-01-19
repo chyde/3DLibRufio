@@ -62,7 +62,7 @@ var update = function() {
 	if(keyboard.down("space")){
 		spawnZombie(rufio.UserZombie);
 	}
-	if(frames > 1000) {
+	if(frames > 100000) {
 		//nothing
 	}
 	else if(frames % 120 == 0){
@@ -229,5 +229,10 @@ addDirectionalLight();
 var c = rufio.createCircle(100, 12, rufio.materials.whiteMaterial);
 c.userData.zIndex = -10;
 c.userData.bodyType = rufio.BodyType.ORNAMENTAL;
+
+// Spawn zombies right away
+for (var zombieIndex = 3; zombieIndex >= 0; zombieIndex--) {
+  spawnZombie(rufio.UserZombie);
+}
 
 render();
