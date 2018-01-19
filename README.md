@@ -1,8 +1,8 @@
 # Game Prototype  
 
 A game prototype I made to learn Three.js and javascript better in general.  If I recall, this was mostly to learn how to program an OOP app in js.  
-
-[[http://www.chris-hyde.com/wp-content/uploads/2016/03/CapturePrototype-300x264.png|alt=Gameplay Screenshot]]
+  
+![Gameplay Screenshot](/CapturePrototype-300x264.png)
 
 
 ## Run  
